@@ -1,16 +1,18 @@
 from car import Car
 from rider import Rider
+from graph import Graph
 
 class Simulation:
-    def __init__(self):
+    def __init__(self, map_filename):
         self.cars = {}
         self.riders = {}
+        self.map = Graph()
+        self.map.load_from_file(map_filename)
 
-# Defining main function
 def main():
-    car1 = Car("car1", (1,2))
-    rider1 = Rider("rider1", (1,2), (9,8))
-    app = Simulation()
+    car1 = Car("car1", ('A'))
+    rider1 = Rider("rider1", ('B'), ('D'))
+    app = Simulation("map.csv")
 
     app.cars[car1.id] = car1
     app.riders[rider1.id] = rider1
@@ -22,8 +24,5 @@ def main():
         print(app.riders[rider])
 
 
-
-# Using the special variable 
-# __name__
 if __name__=="__main__":
     main()
