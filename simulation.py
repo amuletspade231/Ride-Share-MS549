@@ -11,7 +11,7 @@ class Simulation:
 
 def main():
     car1 = Car("car1", ('A'))
-    rider1 = Rider("rider1", ('B'), ('D'))
+    rider1 = Rider("rider1", ('D'), ('B'))
     app = Simulation("map.csv")
 
     app.cars[car1.id] = car1
@@ -22,6 +22,14 @@ def main():
 
     for rider in app.riders:
         print(app.riders[rider])
+
+    car1.assign_rider(rider1)
+
+    car1.calculate_route(app.map.adjacency_list)
+
+    car1.pickup_rider(rider1)
+
+    car1.calculate_route(app.map.adjacency_list)
 
 
 if __name__=="__main__":
