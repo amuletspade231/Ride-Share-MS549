@@ -30,16 +30,16 @@ class QuadtreeNode:
 
         # Create boundaries for the four new quadrants
         ne_rect = Rectangle(x + w / 2, y, w / 2, h / 2)
-        self.northeast = Quadtree(ne_rect, self.capacity)
+        self.northeast = QuadtreeNode(ne_rect, self.capacity)
 
         nw_rect = Rectangle(x, y, w / 2, h / 2)
-        self.northwest = Quadtree(nw_rect, self.capacity)
+        self.northwest = QuadtreeNode(nw_rect, self.capacity)
 
         se_rect = Rectangle(x + w / 2, y + h / 2, w / 2, h / 2)
-        self.southeast = Quadtree(se_rect, self.capacity)
+        self.southeast = QuadtreeNode(se_rect, self.capacity)
 
         sw_rect = Rectangle(x, y + h / 2, w / 2, h / 2)
-        self.southwest = Quadtree(sw_rect, self.capacity)
+        self.southwest = QuadtreeNode(sw_rect, self.capacity)
 
         self.divided = True
 
@@ -70,17 +70,17 @@ class QuadtreeNode:
 
         return False
         
-    def query(self, point, best_found_point, min_distance):
+    def query(self, point, best_found_qt):
         # If this quadrant can't have a closer point, stop.
-        if self.boundary.distance_sq_to_point(point) > min_distance:
+        if self.boundary.distance_sq_to_point(point) > best_found_qt['dist_sq']:
             return
 
         # 2. Check points in this node if not divided
         for p in self.points:
             dist_sq = (p[0] - point[0])**2 + (p[1] - point[1])**2
-            if dist_sq < min_distance:
-                min_distance = dist_sq
-                best_found_point = p
+            if dist_sq < best_found_qt['dist_sq']:
+                best_found_qt['dist_sq'] = dist_sq
+                best_found_qt['point'] = p
 
         # 3. Recursively search children, if divided
         if self.divided:
@@ -89,34 +89,43 @@ class QuadtreeNode:
             children.sort(key=lambda child: child.boundary.distance_sq_to_point(point))
 
             for child in children:
-                child.query(point, best_found_point, min_distance)
+                child.query(point, best_found_qt)
 
         return
+
+    def __str__(self, level=0):
+        """A simple string representation for visualization."""
+        ret = "\t" * level + f"Level {level}, Boundary: {self.boundary.x, self.boundary.y, self.boundary.width, self.boundary.height}\n"
+        ret += "\t" * level + f"Points: {self.points}\n"
+        if self.divided:
+            ret += self.northeast.__str__(level + 1)
+            ret += self.northwest.__str__(level + 1)
+            ret += self.southeast.__str__(level + 1)
+            ret += self.southwest.__str__(level + 1)
+        return ret
 
 class Quadtree:
     def __init__(self, boundary, root):
         self.boundary = boundary
         self.root = root
 
-    def find_nearest(self, query_point):
+    def find_nearest(self, query_point, best_found_qt):
         start = self.root
-        best_found_point = None
-        min_distance =  float('inf')
 
         # Check points in root if not divided
         for p in start.points:
             dist_sq = (p[0] - query_point[0])**2 + (p[1] - query_point[1])**2
-            if dist_sq < min_distance:
-                min_distance = dist_sq
-                best_found_point = p
+            if dist_sq < best_found_qt['dist_sq']:
+                best_found_qt['dist_sq'] = dist_sq
+                best_found_qt['point'] = p
 
         # Recursively search children, if divided
         if start.divided:
-            children = [self.northeast, self.northwest, self.southeast, self.southwest]
+            children = [start.northeast, start.northwest, start.southeast, start.southwest]
             # Search closest children first
-            children.sort(key=lambda child: child.boundary.distance_sq_to_point(point))
+            children.sort(key=lambda child: child.boundary.distance_sq_to_point(query_point))
 
             for child in children:
-                child.query(point, best_found_point, min_distance)
+                child.query(query_point, best_found_qt)
 
-        return best_found_point, min_distance
+        return

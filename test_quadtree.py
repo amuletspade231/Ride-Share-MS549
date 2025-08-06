@@ -19,17 +19,20 @@ if __name__ == "__main__":
     qt = Quadtree(map_boundary, QuadtreeNode(map_boundary, capacity=4))
 
     # Populate random points
-    num_points = 5000
-    points = [(random.uniform(0, 1000), random.uniform(0, 1000))]
+    num_points = 500
+    points = [(random.uniform(0, 1000), random.uniform(0, 1000)) for i in range(num_points)]
     for p in points:
         qt.root.insert(p)
+        
+    print(qt.root)
 
     query_point = (512, 512)
 
     print(f"--- Searching for nearest to {query_point} among {num_points} points ---\n")
 
-    best_point_qt, best_dist_sq_qt = qt.find_nearest(query_point)
-    print(f"Quadtree Search found: {best_point_qt} at distance {math.sqrt(best_dist_sq_qt):.2f}")
+    best_found_qt = {'dist_sq': float('inf'), 'point': None}
+    qt.find_nearest(query_point, best_found_qt)
+    print(f"Quadtree Search found: {best_found_qt['point']} at distance {math.sqrt(best_found_qt['dist_sq']):.2f}")
 
     best_point_bf, best_dist_sq_bf = find_closest_brute_force(query_point, points)
     print(f"Brute-Force Search found: {best_point_bf} at distance {math.sqrt(best_dist_sq_bf):.2f}")
