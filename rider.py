@@ -7,6 +7,12 @@ class Rider:
 
     def __str__(self):
         return f"Rider {self.id} at {self.start_location} waiting for ride to {self.destination}"
+    
+    def __gt__(self, other):
+        if(self.id > other.id):
+            return True
+        else:
+            return False
 
 # def main():
 #     rider1 = Rider("rider1", (1,2), (9,8))

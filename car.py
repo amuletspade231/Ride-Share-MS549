@@ -19,11 +19,16 @@ class Car:
         self.status = 'en route to destination'
         print(f"{self.id} has picked up {rider.id} and is now {self.status} at {self.destination}")
 
+    def dropoff_rider(self, rider):
+        self.location = self.destination
+        self.status = 'available'
+        print(f"{self.id} has dropped up {rider.id} and is now {self.status} at {self.destination}")
+
     def calculate_route(self, map):
         route, route_time = pathfinding.find_shortest_path(map, self.location, self.destination)
 
         print(f"\nShortest path to '{self.destination}': {' -> '.join(route)}")
-        print(f"Total time: {route_time} minutes")
+        print(f"Total time: {route_time} minutes")        
 
     def __str__(self):
         return f"Car {self.id} at {self.location} - Status: {self.status}"
