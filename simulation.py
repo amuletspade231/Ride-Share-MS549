@@ -82,6 +82,7 @@ class Simulation:
         dy = abs(start_location[1] - end_location[1])
         return (dx + dy) * TRAVEL_SPEED_FACTOR
 
+# Coordinate Ver
 def main():
     app = Simulation()
     num_cars = 2
