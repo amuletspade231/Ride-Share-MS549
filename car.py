@@ -22,7 +22,7 @@ class Car:
     def dropoff_rider(self, rider):
         self.location = self.destination
         self.status = 'available'
-        print(f"{self.id} has dropped up {rider.id} and is now {self.status} at {self.destination}")
+        print(f"{self.id} has dropped off {rider.id} and is now {self.status} at {self.destination}")
 
     def calculate_route(self, map):
         route, route_time = pathfinding.find_shortest_path(map, self.location, self.destination)
