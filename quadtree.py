@@ -18,7 +18,7 @@ class QuadtreeNode:
     def __init__(self, boundary, capacity):
         self.boundary = boundary
         self.capacity = capacity
-        self.points = []
+        self.points = {}
         self.divided = False
         self.northwest = None
         self.northeast = None
@@ -45,14 +45,14 @@ class QuadtreeNode:
 
         # Re-insert the points from this node into the new children
         for p in self.points:
-            self.insert(p)
-        self.points = [] # Clear points from parent node
+            self.insert((p,self.points[p]))
+        self.points = {} # Clear points from parent node
 
     def remove(self, point):
-        if not self.boundary.contains(point):
+        if not self.boundary.contains(point[1]):
             return False 
         if not self.divided:
-            self.points.remove(point)
+            self.points.pop(point[0])
         else:
             if self.northwest.remove(point): return True
             if self.northeast.remove(point): return True
@@ -64,12 +64,12 @@ class QuadtreeNode:
 
     def insert(self, point):
         # If point is outside our boundary, do nothing
-        if not self.boundary.contains(point):
+        if not self.boundary.contains(point[1]):
             return False 
 
         # If there's space in this node and it's not divided, add the point
         if len(self.points) < self.capacity and not self.divided:
-            self.points.append(point)
+            self.points[point[0]] = point[1]
             return True
 
         # If node reached capacity and is not yet divided, subdivide it
@@ -91,7 +91,7 @@ class QuadtreeNode:
 
         # 2. Check points in this node if not divided
         for p in self.points:
-            dist_sq = (p[0] - point[0])**2 + (p[1] - point[1])**2
+            dist_sq = (self.points[p][0] - point[0])**2 + (self.points[p][1] - point[1])**2
             if len(best_k_qt) == 5:
                 kth_best = max(best_k_qt)
                 if dist_sq < kth_best:
@@ -131,11 +131,11 @@ class Quadtree:
 
     def find_nearest_k(self, query_point, k = 5):
         start = self.root
-        best_k_qt = {float('inf'): None}
+        best_k_qt = {float('inf'): "None"}
 
         # Check points in root if not divided
         for p in start.points:
-            dist_sq = (p[0] - query_point[0])**2 + (p[1] - query_point[1])**2
+            dist_sq = (start.points[p][0] - query_point[0])**2 + (start.points[p][1] - query_point[1])**2
             if len(best_k_qt) == 5:
                 kth_best = max(best_k_qt)
                 if dist_sq < kth_best:

@@ -9,7 +9,7 @@ if __name__ == "__main__":
         best_p = None
         min_dist_sq = float('inf')
         for p in all_points:
-            dist_sq = (p[0] - query_point[0])**2 + (p[1] - query_point[1])**2
+            dist_sq = (p[1][0] - query_point[0])**2 + (p[1][1] - query_point[1])**2
             if dist_sq < min_dist_sq:
                 min_dist_sq = dist_sq
                 best_p = p
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     # Populate random points
     num_points = 500
-    points = [(random.uniform(0, 1000), random.uniform(0, 1000)) for i in range(num_points)]
+    points = [("P"+str(i),(random.uniform(0, 1000), random.uniform(0, 1000))) for i in range(num_points)]
     for p in points:
         qt.root.insert(p)
         

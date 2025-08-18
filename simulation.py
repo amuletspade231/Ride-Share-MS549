@@ -29,7 +29,7 @@ class Simulation:
         map_boundary = Rectangle(0, 0, max_dim, max_dim)
         self.qt = Quadtree(map_boundary, QuadtreeNode(map_boundary, capacity=4))
         for car in self.cars:
-            self.qt.root.insert(self.cars[car].location)
+            self.qt.root.insert((car, self.cars[car].location))
 
     def generate_rider_request(self, delay):
         rider = Rider("Rider" + str(len(self.riders)), (random.randint(0, self.max_dim), random.randint(0, self.max_dim)), (random.randint(0, self.max_dim), random.randint(0, self.max_dim)))
@@ -59,13 +59,12 @@ class Simulation:
                 self.handle_arrival(data)
 
     def handle_rider_request(self, rider):
-        # best_k_qt = self.qt.find_nearest_k(rider.start_location)
-        # car_id = best_k_qt[min(best_k_qt)].id
-        # car = self.cars[car_id]
-        car = self.find_closest_car_brute_force(rider.start_location)
-        if car:
+        best_k_qt = self.qt.find_nearest_k(rider.start_location)
+        car_id = best_k_qt[min(best_k_qt)]
+        if car_id != "None":
+            car = self.cars[car_id]
             car.assign_rider(rider)
-            self.qt.root.remove(car.location)
+            self.qt.root.remove((car.id, car.location))
             self.add_event(car.eta, "ARRIVAL", (car, rider))
             print(f"ETA: {car.eta}s.")
             self.generate_rider_request(random.expovariate(1.0/MEAN_ARRIVAL_TIME))
@@ -82,7 +81,7 @@ class Simulation:
             print(f"ETA: {car.eta}s.")
         elif car.status == "en route to destination":
             car.dropoff_rider(rider)
-            self.qt.root.insert(car.location)
+            self.qt.root.insert((car.id, car.location))
 
     def find_closest_car_brute_force(self, rider_location):
         closest_car = None
