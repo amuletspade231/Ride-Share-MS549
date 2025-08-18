@@ -1,29 +1,38 @@
 import csv
+import collections
 import pathfinding
+import argparse
 
 class Graph:
+    """
+    Represents a city map with both topological (edges) 
+    and geometric (node coordinates) data.
+    """
     def __init__(self):
-        self.adjacency_list = {}
+        self.adjacency_list = collections.defaultdict(list)
+        # This dictionary is the critical link between the two worlds
+        self.node_coordinates = {}
 
-    def add_edge(self, start_node, end_node, weight):
-        if start_node in self.adjacency_list:
-            self.adjacency_list[start_node].append((end_node, weight))
-        else:
-            self.adjacency_list[start_node] = [(end_node, weight)]
-
-    def load_from_file(self, filename):
-        try:
-            with open(filename, 'r') as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    if len(row) == 3: # Ensure row has 3 elements
-                        start, end, weight = row
-                        self.add_edge(start.strip(), end.strip(), int(weight.strip()))
-            print(self)
-        except FileNotFoundError:
-            print(f"Error: File '{filename}' not found.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+    def load_map_data(self, filename):
+        """
+        Loads all map data from the single, unified 7-column CSV file.
+        This method populates BOTH the adjacency_list and node_coordinates.
+        """
+        with open(filename, 'r') as f:
+            for line in f:
+                if line.startswith('#') or not line.strip():
+                    continue
+                
+                parts = line.strip().split(',')
+                start_id, start_x, start_y, end_id, end_x, end_y, weight = parts
+                
+                # Store the coordinates for both nodes
+                self.node_coordinates[start_id] = (float(start_x), float(start_y))
+                self.node_coordinates[end_id] = (float(end_x), float(end_y))
+                
+                # Store the edge for the undirected graph
+                self.adjacency_list[start_id].append((end_id, float(weight)))
+                self.adjacency_list[end_id].append((start_id, float(weight)))
 
 
     def __str__(self):
@@ -34,11 +43,16 @@ class Graph:
         graph_str += "\n----------------------------"
         return graph_str
 
-def main():
+def main(test):
+    print(test)
     graph = Graph()
-    graph.load_from_file("map.csv")
-    print(pathfinding.find_shortest_path(graph.adjacency_list, "A", "D"))
+    graph.load_map_data("city_map_50.csv")
+    print(pathfinding.find_shortest_path(graph.adjacency_list, "N1", "N2"))
 
 
 if __name__=="__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--test")
+    args = parser.parse_args()
+    test = args.test
+    main(test)

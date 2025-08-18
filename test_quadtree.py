@@ -30,9 +30,9 @@ if __name__ == "__main__":
 
     print(f"--- Searching for nearest to {query_point} among {num_points} points ---\n")
 
-    best_found_qt = {'dist_sq': float('inf'), 'point': None}
-    qt.find_nearest(query_point, best_found_qt)
-    print(f"Quadtree Search found: {best_found_qt['point']} at distance {math.sqrt(best_found_qt['dist_sq']):.2f}")
+    best_k_qt = qt.find_nearest_k(query_point)
+    print(best_k_qt)
+    print(f"Quadtree Search found: {best_k_qt[min(best_k_qt)]} at distance {math.sqrt(min(best_k_qt)):.2f}")
 
     best_point_bf, best_dist_sq_bf = find_closest_brute_force(query_point, points)
     print(f"Brute-Force Search found: {best_point_bf} at distance {math.sqrt(best_dist_sq_bf):.2f}")
