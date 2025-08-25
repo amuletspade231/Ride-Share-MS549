@@ -32,10 +32,11 @@ This protoype uses a simple open coordinate grid to showcase our simulator's eve
 Riders will continuously request rides with a number of cars on grid at random timestamps.
 If the closest car is available at the time of their request, they will get picked up, and taken to their destination.
 Else, they must make a new request and wait for another car to be the closest and be available.
-The simulation will continue until the specified max_time
+The simulation will continue until the specified max_riders
 
 How to Run:
 1) Clone the repository
-2) Tweak city_map_50.csv as desired according to the previously mentioned format
-3) Run 'python3 simulation.py --max_time {enter number here}'
+2) Tweak city_map_50.csv as desired according to the previously mentioned format or comment out the 50-node preset in simulation.py's main() and uncomment the 1000-node preset for a larger data experience
+3) You may also tweak MEAN ARRIVAL TIME in simulation.py to affect request frequency
+4) Run 'python3 simulation.py --max_riders {enter number here}'
 
