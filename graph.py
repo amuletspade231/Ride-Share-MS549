@@ -2,6 +2,7 @@ import csv
 import collections
 import pathfinding
 import argparse
+import math
 
 class Graph:
     """
@@ -9,10 +10,10 @@ class Graph:
     and geometric (node coordinates) data.
     """
     def __init__(self):
-        self.adjacency_list = collections.defaultdict(list)
-        # This dictionary is the critical link between the two worlds
-        self.node_coordinates = {}
+        self.adjacency_list = collections.defaultdict(list) # {start node id: [neighbor node ids]}
+        self.node_coordinates = {} # {node id: (x, y)}
 
+    # load_map_data - creates graph based on csv file contents
     def load_map_data(self, filename):
         """
         Loads all map data from the single, unified 7-column CSV file.
@@ -34,6 +35,13 @@ class Graph:
                 self.adjacency_list[start_id].append((end_id, float(weight)))
                 self.adjacency_list[end_id].append((start_id, float(weight)))
 
+    # calculate_route - finds shortest route based on weighted graph
+    # input: start - node id, end - node id
+    # output: route_time
+    def calculate_route(self, start, end, distance_to_beat=math.inf):
+        route, route_time = pathfinding.find_shortest_path(self.adjacency_list, start, end, distance_to_beat)
+        
+        return route_time 
 
     def __str__(self):
         graph_str = "\n--- Graph Adjacency List ---"
@@ -44,15 +52,11 @@ class Graph:
         return graph_str
 
 def main(test):
-    print(test)
     graph = Graph()
     graph.load_map_data("city_map_50.csv")
+    print(graph)
     print(pathfinding.find_shortest_path(graph.adjacency_list, "N1", "N2"))
 
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--test")
-    args = parser.parse_args()
-    test = args.test
-    main(test)
+    main()
